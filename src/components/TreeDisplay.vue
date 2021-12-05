@@ -1,9 +1,13 @@
 <template>
   <div class="tree">
     <h1>Tree</h1>
+    <div v-for="(row, level) in box" class="row" :key="level">
+      <div v-for="node in row" class="node" :key="node.id" :style="nodeStyle(node, 150)">
+        {{node.value}}
+      </div>
+    </div> 
     <!-- <code>{{ tree }}</code>
     <hr />
-    <code>{{ traverse }}</code>
     <hr /> -->
     <code>
       <!-- <div>{{rootOffset()}}</div>
@@ -14,7 +18,7 @@
       <div v-for="child in traverse" :key="child.id">
         {{ child }}
         <!-- {{ depth(child.id)}} -->
-        {{relativeOffset(child.id)}}
+        <!-- {{ relativeOffset(child.id) }} -->
       </div>
     </code>
   </div>
@@ -81,7 +85,10 @@ export default {
       const result = [];
       const recursiveTraverse = (id) => {
         const node = this.tree.nodes.find((e) => e.id === id);
-        result.push(node);
+        const nodeLinks = this.tree.links.find((e) => e.childNode === id);
+        const depth = this.depth(id);
+        const relativeOffset = this.relativeOffset(id);
+        result.push({ ...node, depth, relativeOffset, ...nodeLinks });
         this.tree.links
           .filter((e) => e.parentNode === id)
           .forEach((e) => recursiveTraverse(e.childNode));
@@ -89,8 +96,35 @@ export default {
       recursiveTraverse(this.tree.root);
       return result;
     },
+    box() {
+      const sorted = [...this.traverse].sort((a, b) => {
+        if (a.depth === b.depth) {
+          return a.relativeOffset - b.relativeOffset;
+        }
+        return a.depth - b.depth;
+      });
+      return sorted.reduce((box, node) => {
+        if (!box[node.depth]) {
+          box[node.depth] = [];
+        }
+        box[node.depth].push(node);
+        return box;
+      }, []);
+    },
     root() {
       return this.tree.nodes.find((e) => e.id === this.tree.root);
+    },
+    rootOffset() {
+      let current = this.tree.root;
+      let result = 0;
+      while (current) {
+        current = this.getLeftChild(current);
+        if (!current) {
+          break;
+        }
+        result++;
+      }
+      return result;
     },
   },
   methods: {
@@ -109,28 +143,16 @@ export default {
         return self.parentNode;
       }
     },
-    rootOffset() {
-      let current = this.tree.root
-      let result = 0;
-      while(current) {
-        current = this.getLeftChild(current);
-        if (!current) {
-          break
-        }
-        result ++
-      }
-      return result;
-    },
     relativeOffset(id) {
+      if (id === this.tree.root) {
+        return 0;
+      }
       const self = this.tree.links.find((e) => e.childNode === id);
-      if (!self) {
-        return 0; // Root
-      }
-      const parentOffset = this.relativeOffset(self.parentNode)
+      const parentOffset = this.relativeOffset(self.parentNode);
       if (self.left) {
-        return parentOffset - 1
+        return parentOffset - 1;
       }
-      return parentOffset + 1
+      return parentOffset + 1;
     },
     children(id) {
       return this.tree.links
@@ -144,6 +166,12 @@ export default {
       }
       return 0;
     },
+    nodeStyle(node, dx = 50) {
+      return {
+        left: `${(node.relativeOffset + this.rootOffset) * dx}px`,
+        // top: `${(node.relativeOffset + this.rootOffset) * 50}px`,
+      }
+    }
   },
 };
 </script>
@@ -153,5 +181,19 @@ export default {
 }
 code {
   white-space: pre-wrap;
+}
+.row {
+  height: 100px;
+  position: relative;
+}
+.node {
+  border: 1px solid #333;
+  width: 80px;
+  height: 80px;
+  position: absolute;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 12px;
 }
 </style>
