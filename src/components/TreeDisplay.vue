@@ -2,10 +2,15 @@
   <div class="tree">
     <h1>Tree</h1>
     <div v-for="(row, level) in box" class="row" :key="level">
-      <div v-for="node in row" class="node" :key="node.id" :style="nodeStyle(node, 150)">
-        {{node.value}}
+      <div
+        v-for="node in row"
+        class="node"
+        :key="node.id"
+        :style="nodeStyle(node, 150)"
+      >
+        {{ node.value }}
       </div>
-    </div> 
+    </div>
     <!-- <code>{{ tree }}</code>
     <hr />
     <hr /> -->
@@ -15,69 +20,19 @@
       <div>{{ depth(102) }}</div>
       <div>{{ depth(104) }}</div> -->
       <!-- <div>{{ root }}</div> -->
-      <div v-for="child in traverse" :key="child.id">
+      <!-- <div v-for="child in traverse" :key="child.id">
         {{ child }}
-        <!-- {{ depth(child.id)}} -->
-        <!-- {{ relativeOffset(child.id) }} -->
-      </div>
+      </div> -->
     </code>
   </div>
 </template>
 <script>
-const links = [
-  {
-    parentNode: 100,
-    childNode: 101,
-    left: true,
-  },
-  {
-    parentNode: 100,
-    childNode: 102,
-    left: false,
-  },
-  {
-    parentNode: 101,
-    childNode: 103,
-    left: true,
-  },
-  {
-    parentNode: 101,
-    childNode: 104,
-    left: false,
-  },
-];
-const nodes = [
-  {
-    id: 100,
-    value: "Root",
-  },
-  {
-    id: 101,
-    value: "Left Child",
-  },
-  {
-    id: 102,
-    value: "Right Child",
-  },
-  {
-    id: 103,
-    value: "Left A",
-  },
-  {
-    id: 104,
-    value: "Left B",
-  },
-];
-const root = 100;
+import tree from "../tree.json";
 export default {
   name: "TreeDisplay",
   data() {
     return {
-      tree: {
-        nodes,
-        links,
-        root,
-      },
+      tree,
     };
   },
   computed: {
@@ -103,14 +58,49 @@ export default {
         }
         return a.depth - b.depth;
       });
-      return sorted.reduce((box, node) => {
+      const box = sorted.reduce((box, node) => {
         if (!box[node.depth]) {
           box[node.depth] = [];
         }
         box[node.depth].push(node);
         return box;
       }, []);
+      box.forEach((row, index) => {
+        const offsets = {};
+        
+        if (index === 2) {
+          console.log(index)
+        }
+        row.forEach((node) => {
+          if (offsets[node.relativeOffset]) {
+            const parent = node.parentNode;
+            const recursiveTraverse = (id) => {
+              const node = sorted.find((e) => e.id === id);
+              node.additionalOffset = node.additionalOffset || 0 + 1;
+              this.tree.links
+                .filter((e) => e.parentNode === id)
+                .forEach((e) => recursiveTraverse(e.childNode));
+            };
+            recursiveTraverse(parent);
+            const { parentNode } = this.tree.links.find(e => e.childNode === parent)
+            const recursiveRaise = (id, offset) => {
+              const parentNode = sorted.find((e) => e.id === id);  
+              if (!parentNode) {
+                return
+              }
+              parentNode.additionalOffset =
+                (parentNode.additionalOffset || 0) + offset;
+                
+              recursiveRaise(parentNode.parentNode, offset / 2)
+            }
+            recursiveRaise(parentNode, 0.5)
+          }
+          offsets[node.relativeOffset] = true;
+        });
+      });
+      return box;
     },
+
     root() {
       return this.tree.nodes.find((e) => e.id === this.tree.root);
     },
@@ -167,11 +157,13 @@ export default {
       return 0;
     },
     nodeStyle(node, dx = 50) {
+      const offset =
+        node.relativeOffset + (node.additionalOffset || 0) + this.rootOffset;
       return {
-        left: `${(node.relativeOffset + this.rootOffset) * dx}px`,
+        left: `${offset * dx}px`,
         // top: `${(node.relativeOffset + this.rootOffset) * 50}px`,
-      }
-    }
+      };
+    },
   },
 };
 </script>
