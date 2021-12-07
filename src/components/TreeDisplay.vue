@@ -11,10 +11,35 @@
         {{ node.value }}
       </div>
     </div>
+    <hr>
+    flatten
+    <div class="canvas">
+      <div
+        v-for="node in flatten"
+        class="node"
+        :key="node.id"
+        :style="nodeXYStyle(node, 150, 150)"
+      >
+        {{ node.value }}
+      </div>
+    </div>
+    <hr>
+    Knuh
+    <div class="canvas">
+      <div
+        v-for="node in knuth"
+        class="node"
+        :key="node.id"
+        :style="nodeXYStyle(node, 50, 150)"
+      >
+        {{ node.value }}
+      </div>
+    </div>
     <!-- <code>{{ tree }}</code>
     <hr />
     <hr /> -->
     <code>
+      {{knuth}}
       <!-- <div>{{rootOffset()}}</div>
       <div>{{ depth(tree.root) }}</div>
       <div>{{ depth(102) }}</div>
@@ -50,6 +75,76 @@ export default {
       };
       recursiveTraverse(this.tree.root);
       return result;
+    },
+    binaryTree() {
+      const elements =  this.tree.nodes.map(node => {
+        const links = this.tree.links.find((e) => e.childNode === node.id);
+        return {...node, links}
+      })
+      const parents = this.tree.links.reduce((parents, item) => {
+        const childNode = parents[item.parentNode] || {}
+        return {...parents, [item.parentNode]: {...childNode, [item.left]: item.childNode}}
+      }, {})
+
+      return elements.map(item => {
+        const {links = {}, ...node} = item
+        const parent = links.parentNode
+        const childrens = parents[node.id] || {}
+        const left = childrens[true]
+        const right = childrens[false]
+        return {
+          ...node, 
+          parent, 
+          left, 
+          right,
+        }
+      })
+    },
+    flatten() {
+      const maxDepth = this.traverse.reduce((max, node) => {
+        if(node.depth > max) {
+          return node.depth
+        }
+        return max
+      }, 0)
+      let nexts = [...new Array(maxDepth + 1)].map(() => 0)
+      const map = this.binaryTree.reduce((map, item) => {
+        return {...map, [item.id]: {...item}}
+      }, {})
+      const root = map[this.tree.root]
+      const minimum_ws = (node, depth = 0) => {
+        node.x = nexts[depth]
+        node.y = depth
+        nexts[depth]++
+        if (node.left) {
+          minimum_ws(map[node.left], depth + 1)
+        }
+        if (node.right) {
+          minimum_ws(map[node.right], depth + 1)
+        }
+      }
+      minimum_ws(root)
+      return map
+    },
+    knuth() {
+      const map = this.binaryTree.reduce((map, item) => {
+        return {...map, [item.id]: {...item}}
+      }, {})
+      let i = 0;
+      const root = map[this.tree.root]
+      const knuth_layout = (node, depth) => {
+        if (node.left) {
+          knuth_layout(map[node.left], depth + 1)
+        }
+        node.x = i;
+        node.y = depth;
+        i++;
+        if (node.right) {
+          knuth_layout(map[node.right], depth + 1)
+        }
+      }
+      knuth_layout(root, 0);
+      return map
     },
     box() {
       const sorted = [...this.traverse].sort((a, b) => {
@@ -164,6 +259,12 @@ export default {
         // top: `${(node.relativeOffset + this.rootOffset) * 50}px`,
       };
     },
+    nodeXYStyle(node, dx = 50, dy = 50) {
+      return {
+        left: `${node.x * dx}px`,
+        top: `${node.y * dy}px`,
+      };
+    },
   },
 };
 </script>
@@ -187,5 +288,11 @@ code {
   align-items: center;
   justify-content: center;
   border-radius: 12px;
+}
+
+.canvas {
+  width: 100%;
+  height: 100vh;
+  position: relative;
 }
 </style>
