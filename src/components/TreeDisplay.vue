@@ -1,21 +1,7 @@
 <template>
   <div class="tree">
-    <h1>Tree</h1>
-    <div class="canvas">
-      <div v-for="(row, level) in box" class="row" :key="level">
-        <div
-          v-for="node in row"
-          class="node"
-          :key="node.id"
-          :style="nodeStyle(node, 150)"
-        >
-          {{ node.value }}
-        </div>
-      </div>
-    </div>
-    <hr />
-    Knuh
-    <div class="canvas">
+    <h1>Knuth</h1>
+    <div class="canvas" :style="{height: `${150 * (maxDepth + 1)}px`}">
       <div
         v-for="node in knuth"
         class="node"
@@ -26,20 +12,8 @@
       </div>
     </div>
     <hr />
-    Wetherell Shannon
-    <div class="canvas">
-      <div
-        v-for="node in wetherellShannon"
-        class="node"
-        :key="node.id"
-        :style="nodeXYStyle(node, 150, 150)"
-      >
-        {{ node.value }}
-      </div>
-    </div>
-    <hr />
-    Wetherell Shannon Mod
-    <div class="canvas">
+    <h1>Wetherell Shannon Mod</h1>
+    <div class="canvas" :style="{height: `${150 * (maxDepth + 1)}px`}">
       <div
         v-for="node in wetherellShannonMod"
         class="node"
@@ -49,21 +23,6 @@
         {{ node.value }}
       </div>
     </div>
-    <hr />
-    <!-- <code>{{ tree }}</code>
-    <hr />
-    <hr /> -->
-    <code>
-      {{ knuth }}
-      <!-- <div>{{rootOffset()}}</div>
-      <div>{{ depth(tree.root) }}</div>
-      <div>{{ depth(102) }}</div>
-      <div>{{ depth(104) }}</div> -->
-      <!-- <div>{{ root }}</div> -->
-      <!-- <div v-for="child in traverse" :key="child.id">
-        {{ child }}
-      </div> -->
-    </code>
   </div>
 </template>
 <script>
@@ -227,55 +186,6 @@ export default {
       addMods(root);
       return map;
     },
-    box() {
-      const sorted = [...this.traverse].sort((a, b) => {
-        if (a.depth === b.depth) {
-          return a.relativeOffset - b.relativeOffset;
-        }
-        return a.depth - b.depth;
-      });
-      const box = sorted.reduce((box, node) => {
-        if (!box[node.depth]) {
-          box[node.depth] = [];
-        }
-        box[node.depth].push(node);
-        return box;
-      }, []);
-      box.forEach((row, index) => {
-        const offsets = {};
-
-        row.forEach((node) => {
-          if (offsets[node.relativeOffset]) {
-            const parent = node.parentNode;
-            const recursiveTraverse = (id) => {
-              const node = sorted.find((e) => e.id === id);
-              node.additionalOffset = node.additionalOffset || 0 + 1;
-              this.tree.links
-                .filter((e) => e.parentNode === id)
-                .forEach((e) => recursiveTraverse(e.childNode));
-            };
-            recursiveTraverse(parent);
-            const { parentNode } = this.tree.links.find(
-              (e) => e.childNode === parent
-            );
-            const recursiveRaise = (id, offset) => {
-              const parentNode = sorted.find((e) => e.id === id);
-              if (!parentNode) {
-                return;
-              }
-              parentNode.additionalOffset =
-                (parentNode.additionalOffset || 0) + offset;
-
-              recursiveRaise(parentNode.parentNode, offset / 2);
-            };
-            recursiveRaise(parentNode, 0.5);
-          }
-          offsets[node.relativeOffset] = true;
-        });
-      });
-      return box;
-    },
-
     root() {
       return this.tree.nodes.find((e) => e.id === this.tree.root);
     },
@@ -368,6 +278,7 @@ code {
   align-items: center;
   justify-content: center;
   border-radius: 12px;
+  text-align: center;
 }
 
 .canvas {

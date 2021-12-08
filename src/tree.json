@@ -39,6 +39,21 @@
       "parentNode": 105,
       "childNode": 108,
       "left": true
+    },
+    {
+      "parentNode": 103,
+      "childNode": 109,
+      "left": true
+    },
+    {
+      "parentNode": 109,
+      "childNode": 110,
+      "left": true
+    },
+    {
+      "parentNode": 110,
+      "childNode": 111,
+      "left": true
     }
   ],
   "nodes": [
@@ -77,6 +92,18 @@
     {
       "id": 108,
       "value": "Right A+"
+    },
+    {
+      "id": 109,
+      "value": "Left chain 1"
+    },
+    {
+      "id": 110,
+      "value": "Left chain 2"
+    },
+    {
+      "id": 111,
+      "value": "Left chain 3"
     }
   ],
   "root": 100
