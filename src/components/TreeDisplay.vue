@@ -1,29 +1,19 @@
 <template>
   <div class="tree">
     <h1>Tree</h1>
-    <div v-for="(row, level) in box" class="row" :key="level">
-      <div
-        v-for="node in row"
-        class="node"
-        :key="node.id"
-        :style="nodeStyle(node, 150)"
-      >
-        {{ node.value }}
-      </div>
-    </div>
-    <hr>
-    flatten
     <div class="canvas">
-      <div
-        v-for="node in flatten"
-        class="node"
-        :key="node.id"
-        :style="nodeXYStyle(node, 150, 150)"
-      >
-        {{ node.value }}
+      <div v-for="(row, level) in box" class="row" :key="level">
+        <div
+          v-for="node in row"
+          class="node"
+          :key="node.id"
+          :style="nodeStyle(node, 150)"
+        >
+          {{ node.value }}
+        </div>
       </div>
     </div>
-    <hr>
+    <hr />
     Knuh
     <div class="canvas">
       <div
@@ -35,11 +25,36 @@
         {{ node.value }}
       </div>
     </div>
+    <hr />
+    Wetherell Shannon
+    <div class="canvas">
+      <div
+        v-for="node in wetherellShannon"
+        class="node"
+        :key="node.id"
+        :style="nodeXYStyle(node, 150, 150)"
+      >
+        {{ node.value }}
+      </div>
+    </div>
+    <hr />
+    Wetherell Shannon Mod
+    <div class="canvas">
+      <div
+        v-for="node in wetherellShannonMod"
+        class="node"
+        :key="node.id"
+        :style="nodeXYStyle(node, 150, 150)"
+      >
+        {{ node.value }}
+      </div>
+    </div>
+    <hr />
     <!-- <code>{{ tree }}</code>
     <hr />
     <hr /> -->
     <code>
-      {{knuth}}
+      {{ knuth }}
       <!-- <div>{{rootOffset()}}</div>
       <div>{{ depth(tree.root) }}</div>
       <div>{{ depth(102) }}</div>
@@ -76,75 +91,141 @@ export default {
       recursiveTraverse(this.tree.root);
       return result;
     },
-    binaryTree() {
-      const elements =  this.tree.nodes.map(node => {
-        const links = this.tree.links.find((e) => e.childNode === node.id);
-        return {...node, links}
-      })
-      const parents = this.tree.links.reduce((parents, item) => {
-        const childNode = parents[item.parentNode] || {}
-        return {...parents, [item.parentNode]: {...childNode, [item.left]: item.childNode}}
-      }, {})
-
-      return elements.map(item => {
-        const {links = {}, ...node} = item
-        const parent = links.parentNode
-        const childrens = parents[node.id] || {}
-        const left = childrens[true]
-        const right = childrens[false]
-        return {
-          ...node, 
-          parent, 
-          left, 
-          right,
+    maxDepth() {
+      return this.traverse.reduce((max, node) => {
+        if (node.depth > max) {
+          return node.depth;
         }
-      })
+        return max;
+      }, 0);
     },
-    flatten() {
-      const maxDepth = this.traverse.reduce((max, node) => {
-        if(node.depth > max) {
-          return node.depth
-        }
-        return max
-      }, 0)
-      let nexts = [...new Array(maxDepth + 1)].map(() => 0)
-      const map = this.binaryTree.reduce((map, item) => {
-        return {...map, [item.id]: {...item}}
-      }, {})
-      const root = map[this.tree.root]
-      const minimum_ws = (node, depth = 0) => {
-        node.x = nexts[depth]
-        node.y = depth
-        nexts[depth]++
-        if (node.left) {
-          minimum_ws(map[node.left], depth + 1)
-        }
-        if (node.right) {
-          minimum_ws(map[node.right], depth + 1)
-        }
-      }
-      minimum_ws(root)
-      return map
+    binaryTree() {
+      const elements = this.tree.nodes.map((node) => {
+        const links = this.tree.links.find((e) => e.childNode === node.id);
+        return { ...node, links };
+      });
+      const parents = this.tree.links.reduce((parents, item) => {
+        const childNode = parents[item.parentNode] || {};
+        return {
+          ...parents,
+          [item.parentNode]: { ...childNode, [item.left]: item.childNode },
+        };
+      }, {});
+
+      return elements.map((item) => {
+        const { links = {}, ...node } = item;
+        const parent = links.parentNode;
+        const childrens = parents[node.id] || {};
+        const left = childrens[true];
+        const right = childrens[false];
+        return {
+          ...node,
+          parent,
+          left,
+          right,
+        };
+      });
     },
     knuth() {
       const map = this.binaryTree.reduce((map, item) => {
-        return {...map, [item.id]: {...item}}
-      }, {})
+        return { ...map, [item.id]: { ...item } };
+      }, {});
       let i = 0;
-      const root = map[this.tree.root]
+      const root = map[this.tree.root];
       const knuth_layout = (node, depth) => {
         if (node.left) {
-          knuth_layout(map[node.left], depth + 1)
+          knuth_layout(map[node.left], depth + 1);
         }
         node.x = i;
         node.y = depth;
         i++;
         if (node.right) {
-          knuth_layout(map[node.right], depth + 1)
+          knuth_layout(map[node.right], depth + 1);
         }
-      }
+      };
       knuth_layout(root, 0);
-      return map
+      return map;
+    },
+    wetherellShannon() {
+      const maxDepth = this.traverse.reduce((max, node) => {
+        if (node.depth > max) {
+          return node.depth;
+        }
+        return max;
+      }, 0);
+      let nexts = [...new Array(maxDepth + 1)].map(() => 0);
+      const map = this.binaryTree.reduce((map, item) => {
+        return { ...map, [item.id]: { ...item } };
+      }, {});
+      const root = map[this.tree.root];
+      const minimum_ws = (node, depth = 0) => {
+        node.x = nexts[depth];
+        node.y = depth;
+        nexts[depth]++;
+        if (node.left) {
+          minimum_ws(map[node.left], depth + 1);
+        }
+        if (node.right) {
+          minimum_ws(map[node.right], depth + 1);
+        }
+      };
+      minimum_ws(root);
+      return map;
+    },
+    wetherellShannonMod() {
+      const maxDepth = this.traverse.reduce((max, node) => {
+        if (node.depth > max) {
+          return node.depth;
+        }
+        return max;
+      }, 0);
+      const nexts = [...new Array(maxDepth + 1)].map(() => 0);
+      const offsets = [...new Array(maxDepth + 1)].map(() => 0);
+      const map = this.binaryTree.reduce((map, item) => {
+        return { ...map, [item.id]: { ...item } };
+      }, {});
+      const root = map[this.tree.root];
+
+      const setup = (node, depth = 0) => {
+        if (node.left) {
+          setup(map[node.left], depth + 1);
+          console.log(nexts);
+        }
+        if (node.right) {
+          setup(map[node.right], depth + 1);
+        }
+        node.y = depth;
+        let place;
+        if (node.left && node.right) {
+          place = (map[node.left].x + map[node.right].x) / 2;
+        } else if (node.left) {
+          place = map[node.left].x;
+        } else if (node.right) {
+          place = map[node.right].x;
+        } else {
+          place = nexts[depth];
+          node.x = place;
+        }
+        offsets[depth] = Math.max(offsets[depth], nexts[depth] - place);
+        if (node.left || node.right) {
+          node.x = place + offsets[depth];
+        }
+        nexts[depth] += 2;
+        node.mod = offsets[depth];
+      };
+      const addMods = (node, modSum = 0) => {
+        node.x += modSum;
+        modSum += node.mod || 0;
+        if (node.left) {
+          addMods(map[node.left], modSum);
+        }
+        if (node.right) {
+          addMods(map[node.right], modSum);
+        }
+      };
+      setup(root);
+      addMods(root);
+      return map;
     },
     box() {
       const sorted = [...this.traverse].sort((a, b) => {
@@ -162,10 +243,7 @@ export default {
       }, []);
       box.forEach((row, index) => {
         const offsets = {};
-        
-        if (index === 2) {
-          console.log(index)
-        }
+
         row.forEach((node) => {
           if (offsets[node.relativeOffset]) {
             const parent = node.parentNode;
@@ -177,18 +255,20 @@ export default {
                 .forEach((e) => recursiveTraverse(e.childNode));
             };
             recursiveTraverse(parent);
-            const { parentNode } = this.tree.links.find(e => e.childNode === parent)
+            const { parentNode } = this.tree.links.find(
+              (e) => e.childNode === parent
+            );
             const recursiveRaise = (id, offset) => {
-              const parentNode = sorted.find((e) => e.id === id);  
+              const parentNode = sorted.find((e) => e.id === id);
               if (!parentNode) {
-                return
+                return;
               }
               parentNode.additionalOffset =
                 (parentNode.additionalOffset || 0) + offset;
-                
-              recursiveRaise(parentNode.parentNode, offset / 2)
-            }
-            recursiveRaise(parentNode, 0.5)
+
+              recursiveRaise(parentNode.parentNode, offset / 2);
+            };
+            recursiveRaise(parentNode, 0.5);
           }
           offsets[node.relativeOffset] = true;
         });
