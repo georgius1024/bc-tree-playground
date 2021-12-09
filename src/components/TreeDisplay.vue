@@ -2,18 +2,33 @@
   <div class="tree">
     <h1>Knuth</h1>
     <div class="canvas" :style="{ height: `${150 * (maxDepth + 1)}px` }">
-      <div
+      <KnuthTreeNode
         v-for="node in knuth"
-        class="node"
         :key="node.id"
-        :style="nodeXYStyle(node, 50, 150)"
-      >
-        {{ node.value }}
-      </div>
+        :node="node"
+        :width="80"
+        :height="80"
+        :dx="50"
+        :dy="120"
+        :left="knutChild(node.left)"
+        :right="knutChild(node.right)"
+      />
     </div>
     <hr />
     <h1>Wetherell Shannon Mod</h1>
     <div class="canvas" :style="{ height: `${150 * (maxDepth + 1)}px` }">
+      <TreeNode
+        v-for="node in wetherellShannonMod"
+        :key="node.id"
+        :node="node"
+        :width="80"
+        :height="80"
+        :dx="120"
+        :dy="120"
+        :left="wetherellChild(node.left)"
+        :right="wetherellChild(node.right)"
+      />
+<!-- 
       <div
         v-for="node in wetherellShannonMod"
         class="node"
@@ -21,14 +36,20 @@
         :style="nodeXYStyle(node, 150, 150)"
       >
         {{ node.value }}
-      </div>
+      </div> -->
     </div>
   </div>
 </template>
 <script>
 import tree from "../tree.json";
+import KnuthTreeNode from './KnuthTreeNode.vue'
+import TreeNode from './TreeNode.vue'
 export default {
   name: "TreeDisplay",
+  components: {
+    KnuthTreeNode,
+    TreeNode
+  },
   data() {
     return {
       tree,
@@ -105,32 +126,6 @@ export default {
       knuth_layout(root, 0);
       return map;
     },
-    wetherellShannon() {
-      const maxDepth = this.traverse.reduce((max, node) => {
-        if (node.depth > max) {
-          return node.depth;
-        }
-        return max;
-      }, 0);
-      let nexts = [...new Array(maxDepth + 1)].map(() => 0);
-      const map = this.binaryTree.reduce((map, item) => {
-        return { ...map, [item.id]: { ...item } };
-      }, {});
-      const root = map[this.tree.root];
-      const minimum_ws = (node, depth = 0) => {
-        node.x = nexts[depth];
-        node.y = depth;
-        nexts[depth]++;
-        if (node.left) {
-          minimum_ws(map[node.left], depth + 1);
-        }
-        if (node.right) {
-          minimum_ws(map[node.right], depth + 1);
-        }
-      };
-      minimum_ws(root);
-      return map;
-    },
     wetherellShannonMod() {
       const maxDepth = this.traverse.reduce((max, node) => {
         if (node.depth > max) {
@@ -148,7 +143,6 @@ export default {
       const setup = (node, depth = 0) => {
         if (node.left) {
           setup(map[node.left], depth + 1);
-          console.log(nexts);
         }
         if (node.right) {
           setup(map[node.right], depth + 1);
@@ -203,6 +197,12 @@ export default {
     },
   },
   methods: {
+    knutChild(id) {
+      return this.knuth[id]
+    },
+    wetherellChild(id) {
+      return this.wetherellShannonMod[id]
+    },
     isLeaf(id) {
       return !this.tree.links.find((e) => e.parentNode === id);
     },
