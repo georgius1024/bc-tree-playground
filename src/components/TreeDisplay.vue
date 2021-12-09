@@ -1,7 +1,7 @@
 <template>
   <div class="tree">
     <h1>Knuth</h1>
-    <div class="canvas" :style="{height: `${150 * (maxDepth + 1)}px`}">
+    <div class="canvas" :style="{ height: `${150 * (maxDepth + 1)}px` }">
       <div
         v-for="node in knuth"
         class="node"
@@ -13,7 +13,7 @@
     </div>
     <hr />
     <h1>Wetherell Shannon Mod</h1>
-    <div class="canvas" :style="{height: `${150 * (maxDepth + 1)}px`}">
+    <div class="canvas" :style="{ height: `${150 * (maxDepth + 1)}px` }">
       <div
         v-for="node in wetherellShannonMod"
         class="node"
