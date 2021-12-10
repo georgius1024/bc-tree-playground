@@ -10,10 +10,26 @@
         :height="80"
         :dx="50"
         :dy="120"
-        :left="knutChild(node.left)"
-        :right="knutChild(node.right)"
+        :left="knuth[node.left]"
+        :right="knuth[node.right]"
       />
     </div>
+    <hr />
+    <h1>Wetherell Shannon</h1>
+    <div class="canvas" :style="{ height: `${150 * (maxDepth + 1)}px` }">
+      <WetherellShannonTreeNode
+        v-for="node in wetherellShannon"
+        :key="node.id"
+        :node="node"
+        :width="80"
+        :height="80"
+        :dx="120"
+        :dy="120"
+        :left="wetherellShannon[node.left]"
+        :right="wetherellShannon[node.right]"
+      />
+    </div>
+
     <hr />
     <h1>Wetherell Shannon Mod</h1>
     <div class="canvas" :style="{ height: `${150 * (maxDepth + 1)}px` }">
@@ -25,21 +41,23 @@
         :height="80"
         :dx="120"
         :dy="120"
-        :left="wetherellChild(node.left)"
-        :right="wetherellChild(node.right)"
+        :left="wetherellShannonMod[node.left]"
+        :right="wetherellShannonMod[node.right]"
       />
     </div>
   </div>
 </template>
 <script>
 import tree from "../pq-tree.json";
-import KnuthTreeNode from './KnuthTreeNode.vue'
-import TreeNode from './TreeNode.vue'
+import KnuthTreeNode from "./KnuthTreeNode.vue";
+import WetherellShannonTreeNode from "./WetherellShannonTreeNode.vue";
+import TreeNode from "./TreeNode.vue";
 export default {
   name: "TreeDisplay",
   components: {
     KnuthTreeNode,
-    TreeNode
+    TreeNode,
+    WetherellShannonTreeNode,
   },
   data() {
     return {
@@ -117,6 +135,32 @@ export default {
       knuth_layout(root, 0);
       return map;
     },
+    wetherellShannon() {
+      const maxDepth = this.traverse.reduce((max, node) => {
+        if (node.depth > max) {
+          return node.depth;
+        }
+        return max;
+      }, 0);
+      let nexts = [...new Array(maxDepth + 1)].map(() => 0);
+      const map = this.binaryTree.reduce((map, item) => {
+        return { ...map, [item.id]: { ...item } };
+      }, {});
+      const root = map[this.tree.root];
+      const minimum_ws = (node, depth = 0) => {
+        node.x = nexts[depth];
+        node.y = depth;
+        nexts[depth]++;
+        if (node.left) {
+          minimum_ws(map[node.left], depth + 1);
+        }
+        if (node.right) {
+          minimum_ws(map[node.right], depth + 1);
+        }
+      };
+      minimum_ws(root);
+      return map;
+    },
     wetherellShannonMod() {
       const maxDepth = this.traverse.reduce((max, node) => {
         if (node.depth > max) {
@@ -189,10 +233,10 @@ export default {
   },
   methods: {
     knutChild(id) {
-      return this.knuth[id]
+      return this.knuth[id];
     },
     wetherellChild(id) {
-      return this.wetherellShannonMod[id]
+      return this.wetherellShannonMod[id];
     },
     isLeaf(id) {
       return !this.tree.links.find((e) => e.parentNode === id);
