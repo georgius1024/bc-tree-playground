@@ -3,23 +3,25 @@
     {{ node.value }}
   </div>
   <template v-if="bothChildren">
-    <Connector
+    <SideConnector
       :fromX="leftConnectionPoint.x"
       :fromY="leftConnectionPoint.y"
       :toX="leftChildConnection.x"
       :toY="leftChildConnection.y"
       stroke="4"
+      radius="24"
     />
-    <Connector
+    <SideConnector
       :fromX="rightConnectionPoint.x"
       :fromY="rightConnectionPoint.y"
       :toX="rightChildConnection.x"
       :toY="rightChildConnection.y"
       stroke="4"
+      radius="24"
     />
   </template>
   <template v-else-if="singleChild">
-    <Connector
+    <LineConnector
       :fromX="centralConnectionPoint.x"
       :fromY="centralConnectionPoint.y"
       :toX="singleChildConnection.x"
@@ -29,10 +31,12 @@
   </template>
 </template>
 <script>
-import Connector from "./Connector.vue";
+import LineConnector from "./LineConnector.vue";
+import SideConnector from "./SideConnector.vue";
 export default {
   components: {
-    Connector,
+    LineConnector,
+    SideConnector
   },
   props: ["node", "width", "height", "dx", "dy", "left", "right"],
   computed: {
@@ -60,17 +64,15 @@ export default {
       };
     },
     leftConnectionPoint() {
-      const {x, y} = this.centralConnectionPoint
       return {
-        x: x - this.width / 8,
-        y
+        x: this.node.x * this.dx + this.width / 2,
+        y: this.node.y * this.dy + this.height / 2
       };
     },
     rightConnectionPoint() {
-      const {x, y} = this.centralConnectionPoint
       return {
-        x: x + this.width / 8,
-        y
+        x: this.node.x * this.dx + this.width * 3 / 2,
+        y: this.node.y * this.dy + this.height / 2
       };
     },
     leftChildConnection() {

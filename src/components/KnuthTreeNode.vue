@@ -3,7 +3,7 @@
     {{ node.value }}
   </div>
 
-  <Connector
+  <LineConnector
     v-if="left"
     :fromX="leftConnectionPoint.x"
     :fromY="leftConnectionPoint.y"
@@ -11,7 +11,7 @@
     :toY="leftChildConnection.y"
     stroke="4"
   />
-  <Connector
+  <LineConnector
     v-if="right"
     :fromX="rightConnectionPoint.x"
     :fromY="rightConnectionPoint.y"
@@ -24,6 +24,22 @@
 import TreeNode from "./TreeNode.vue";
 export default {
   extends: TreeNode,
+  computed: {
+    leftConnectionPoint() {
+      const {x, y} = this.centralConnectionPoint
+      return {
+        x: x - this.width / 8,
+        y
+      };
+    },
+    rightConnectionPoint() {
+      const {x, y} = this.centralConnectionPoint
+      return {
+        x: x + this.width / 8,
+        y
+      };
+    },
+  }
 };
 </script>
 <style lang="scss" scoped>
