@@ -28,20 +28,11 @@
         :left="wetherellChild(node.left)"
         :right="wetherellChild(node.right)"
       />
-<!-- 
-      <div
-        v-for="node in wetherellShannonMod"
-        class="node"
-        :key="node.id"
-        :style="nodeXYStyle(node, 150, 150)"
-      >
-        {{ node.value }}
-      </div> -->
     </div>
   </div>
 </template>
 <script>
-import tree from "../tree.json";
+import tree from "../pq-tree.json";
 import KnuthTreeNode from './KnuthTreeNode.vue'
 import TreeNode from './TreeNode.vue'
 export default {

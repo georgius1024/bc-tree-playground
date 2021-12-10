@@ -43,6 +43,9 @@ export default {
     isLeaf() {
       return !this.left && !this.right
     },
+    hasLayout() {
+      return ('x' in this.node)
+    },
     bothChildren() {
       return this.left && this.right
     },
@@ -55,6 +58,7 @@ export default {
         top: `${this.node.y * this.dy}px`,
         width: `${this.width}px`,
         height: `${this.height}px`,
+        display: this.hasLayout ? 'flex' : 'none'
       };
     },
     centralConnectionPoint() {

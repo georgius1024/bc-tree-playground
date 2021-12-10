@@ -1,49 +1,44 @@
 {
   "links": [
     {
-      "parentNode": 100,
-      "childNode": 101,
-      "left": true
-    },
-    {
-      "parentNode": 100,
+      "parentNode": 101,
       "childNode": 102,
-      "left": false
+      "left": true
     },
     {
       "parentNode": 101,
       "childNode": 103,
-      "left": true
+      "left": false
     },
     {
-      "parentNode": 101,
+      "parentNode": 103,
       "childNode": 104,
-      "left": false
-    },
-    {
-      "parentNode": 102,
-      "childNode": 105,
-      "left": true
-    },
-    {
-      "parentNode": 102,
-      "childNode": 106,
-      "left": false
-    },
-    {
-      "parentNode": 104,
-      "childNode": 107,
-      "left": false
-    },
-    {
-      "parentNode": 105,
-      "childNode": 108,
       "left": true
     },
     {
       "parentNode": 103,
-      "childNode": 109,
+      "childNode": 107,
+      "left": false
+    },
+    {
+      "parentNode": 104,
+      "childNode": 105,
       "left": true
+    },    
+    {
+      "parentNode": 105,
+      "childNode": 106,
+      "left": false
+    },
+    {
+      "parentNode": 107,
+      "childNode": 108,
+      "left": true
+    },
+    {
+      "parentNode": 107,
+      "childNode": 109,
+      "left": false
     },
     {
       "parentNode": 109,
@@ -54,57 +49,110 @@
       "parentNode": 110,
       "childNode": 111,
       "left": true
+    },
+    {
+      "parentNode": 111,
+      "childNode": 112,
+      "left": false
+    },
+    {
+      "parentNode": 109,
+      "childNode": 113,
+      "left": false
+    },
+    {
+      "parentNode": 113,
+      "childNode": 114,
+      "left": true
+    },
+    {
+      "parentNode": 114,
+      "childNode": 115,
+      "left": false
+    },
+    {
+      "parentNode": 113,
+      "childNode": 116,
+      "left": false
+    },
+    {
+      "parentNode": 116,
+      "childNode": 117,
+      "left": true
     }
+
+
+
   ],
   "nodes": [
     {
-      "id": 100,
+      "id": 101,
       "value": "Root"
     },
     {
-      "id": 101,
-      "value": "left Child"
-    },
-    {
       "id": 102,
-      "value": "Right Child"
+      "value": "102"
     },
     {
       "id": 103,
-      "value": "Left A"
+      "value": "103"
     },
     {
       "id": 104,
-      "value": "Left B"
+      "value": "104"
     },
     {
       "id": 105,
-      "value": "Right A"
+      "value": "105"
     },
     {
       "id": 106,
-      "value": "Right B"
+      "value": "106"
     },
     {
       "id": 107,
-      "value": "Left B+"
+      "value": "107"
     },
     {
       "id": 108,
-      "value": "Right A+"
+      "value": "108"
     },
     {
       "id": 109,
-      "value": "Left chain 1"
+      "value": "109"
     },
     {
       "id": 110,
-      "value": "Left chain 2"
+      "value": "110"
     },
     {
       "id": 111,
-      "value": "Left chain 3"
+      "value": "111"
+    },
+    {
+      "id": 112,
+      "value": "112"
+    },
+    {
+      "id": 113,
+      "value": "113"
+    },
+    {
+      "id": 114,
+      "value": "114"
+    },
+    {
+      "id": 115,
+      "value": "115"
+    },
+    {
+      "id": 116,
+      "value": "116"
+    },
+    {
+      "id": 117,
+      "value": "117"
     }
   ],
-  "root": 100
+  "root": 101
 }
