@@ -1,7 +1,7 @@
 <template>
   <div class="tree">
     <h1>Knuth</h1>
-    <div class="canvas" :style="{height: `${150 * (maxDepth + 1)}px`}">
+    <div class="canvas" :style="{ height: `${150 * (maxDepth + 1)}px` }">
       <div
         v-for="node in knuth"
         class="node"
@@ -13,7 +13,7 @@
     </div>
     <hr />
     <h1>Wetherell Shannon Mod</h1>
-    <div class="canvas" :style="{height: `${150 * (maxDepth + 1)}px`}">
+    <div class="canvas" :style="{ height: `${150 * (maxDepth + 1)}px` }">
       <div
         v-for="node in wetherellShannonMod"
         class="node"
@@ -23,10 +23,22 @@
         {{ node.value }}
       </div>
     </div>
+    <h1>Walker</h1>
+    <div class="canvas" :style="{ height: `${150 * (maxDepth + 1)}px` }">
+      <div
+        v-for="node in walker"
+        class="node"
+        :key="node.id"
+        :style="nodeXYStyle(node, 150, 150)"
+      >
+        {{ node.data }}
+      </div>
+    </div>
   </div>
 </template>
 <script>
 import tree from "../tree.json";
+import TreeMaker from "../libs/Tree";
 export default {
   name: "TreeDisplay",
   data() {
@@ -185,6 +197,24 @@ export default {
       setup(root);
       addMods(root);
       return map;
+    },
+    walker() {
+      const treeMaker = new TreeMaker();
+      treeMaker.config = {
+        ...treeMaker.config,
+        topYAdjustment: -3,
+      };
+      this.binaryTree.forEach((node) => {
+        treeMaker.add(node.id, node.parent || null, node.value);
+      });
+      return treeMaker
+        .layoutTree()
+        .map((item) => {
+          return { ...item, name: item.data };
+        })
+        .reduce((map, item) => {
+          return { ...map, [item.id]: { ...item } };
+        }, {});
     },
     root() {
       return this.tree.nodes.find((e) => e.id === this.tree.root);
