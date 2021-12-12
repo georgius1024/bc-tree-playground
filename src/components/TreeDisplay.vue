@@ -45,31 +45,31 @@
         :right="wetherellShannonMod[node.right]"
       />
     </div>
-
     <hr />
-    <h1>Rheingold Tilford</h1>
-    <div class="canvas" :style="{ height: `${120 * (maxDepth + 1)}px` }">
+    <h1>Walker</h1>
+    <div class="canvas" :style="{ height: `${150 * (maxDepth + 1)}px` }">
       <TreeNode
-        v-for="node in reingoldTilford"
+        v-for="node in walker"
         :key="node.id"
         :node="node"
         :width="80"
         :height="80"
         :dx="120"
         :dy="120"
-        :left="reingoldTilford[node.left]"
-        :right="reingoldTilford[node.right]"
+        :left="walker[node.left]"
+        :right="walker[node.right]"
       />
     </div>
   </div>
 </template>
 <script>
-import tree from "../tree.json";
+//import tree from "../tree.json";
 //import tree from "../pq-tree.json";
-// import tree from "../pq-tree-m.json";
+import tree from "../pq-tree-m.json";
 import KnuthTreeNode from "./KnuthTreeNode.vue";
 import WetherellShannonTreeNode from "./WetherellShannonTreeNode.vue";
 import TreeNode from "./TreeNode.vue";
+import TreeMaker from "../libs/Tree";
 export default {
   name: "TreeDisplay",
   components: {
@@ -235,224 +235,37 @@ export default {
       addMods(root);
       return map;
     },
-    reingoldTilford() {
-      const step = 2;
-      const maxDepth = this.maxDepth;
+    walker() {
+      const treeMaker = new TreeMaker();
+      treeMaker.config = {
+        ...treeMaker.config,
+        topYAdjustment: -3,
+      };
       const map = this.binaryTree.reduce((map, item) => {
         return { ...map, [item.id]: { ...item } };
       }, {});
       const root = map[this.tree.root];
-      const getNode = (id) => {
-        return map[id];
-      };
-      const traverse = (node, callback) => {
-        callback(node);
+      const walk = (node) => {
+        treeMaker.add(node.id, node.parent || null, node);
         if (node.left) {
-          traverse(getNode(node.left), callback);
+          walk(map[node.left])
         }
         if (node.right) {
-          traverse(getNode(node.right), callback);
+          walk(map[node.right])
         }
-      };
-      const prepareData = (node, level, prevSibling) => {
-        node.y = level;
-        node.x = 0;
-        node.final = 0;
-        node.modifier = 0;
-        node.prevSibling = prevSibling;
-        if (node.left) {
-          prepareData(getNode(node.left), level + 1, null);
-        }
-        if (node.right) {
-          prepareData(getNode(node.right), level + 1, node.left || null);
-        }
-      };
-
-      const firstPass = (node) => {
-        if (node.left) {
-          firstPass(getNode(node.left));
-        }
-        if (node.right) {
-          firstPass(getNode(node.right));
-        }
-        if (node.prevSibling) {
-          node.x = node.x + getNode(node.prevSibling).x + step;
-        } else {
-          node.x = 0;
-        }
-        if (node.left && node.right) {
-          node.modifier =
-            node.x - (getNode(node.right).x + getNode(node.left).x) / 2;
-        } else if (node.left || node.right) {
-          node.modifier = node.x;
-        }
-      };
-      const secondPass = (node, modSum) => {
-        node.final = node.x + modSum;
-        if (node.left) {
-          secondPass(getNode(node.left), node.modifier + modSum);
-        }
-        if (node.right) {
-          secondPass(getNode(node.right), node.modifier + modSum);
-        }
-      };
-      const fixNodeConflicts = (node) => {
-        if (node.left) {
-          fixNodeConflicts(getNode(node.left));
-        }
-        if (node.right) {
-          fixNodeConflicts(getNode(node.right));
-        }
-
-        let leftContour = -Infinity;
-        if (node.left) {
-          traverse(getNode(node.left), (node) => {
-            leftContour = Math.max(leftContour, node.final);
-          });
-        }
-
-        let rightContour = +Infinity;
-        if (node.right) {
-          traverse(getNode(node.right), (node) => {
-            rightContour = Math.min(rightContour, node.final);
-          });
-        }
-
-        if (leftContour >= rightContour) {
-          traverse(
-            getNode(node.right),
-            (node) => (node.final += leftContour - rightContour + step)
-          );
-        }
-        node.x = node.final;
-        delete node.final;
-      };
-      const fixLeftBorder = (node) => {
-        let leftCorrection = Infinity;
-        traverse(
-          node,
-          (node) => (leftCorrection = Math.min(node.x, leftCorrection))
-        );
-        if (leftCorrection < 0) {
-          traverse(node, (node) => (node.x -= leftCorrection));
-        }
-      };
-      prepareData(root, 0, null);
-      firstPass(root);
-      secondPass(root, 0);
-      fixNodeConflicts(root);
-      fixLeftBorder(root);
-      return map;
-    },
-    contours() {
-      const step = 2;
-      const maxDepth = this.maxDepth;
-      const map = this.binaryTree.reduce((map, item) => {
-        return { ...map, [item.id]: { ...item } };
-      }, {});
-      const root = map[this.tree.root];
-      const getNode = (id) => {
-        return map[id];
-      };
-      // const contour = (node, op, level = 0, contour = []) => {
-      //   if (contour.length < level + 1) {
-      //     contour.push(node.x)
-      //   } else if (op === 'gt' && contour[level] > node.x ) {
-      //     contour[level] = node.x
-      //   } else if (op === 'lt' && contour[level] < node.x ) {
-      //     contour[level] = node.x
-      //   }
-      //   return contour
-      // }
-      // const pushRight = (left, right) => {
-      //   const wl = contour(left, 'lt')
-      //   const wr = contour(right, 'gt')
-      // }
-      const nextRight = (node) => {
-        if (node.thread) {
-          return node.thread;
-        }
-        if (tree.right) {
-          return tree.right;
-        }
-      };
-      const nextLeft = (node) => {
-        if (node.thread) {
-          return node.thread;
-        }
-        if (tree.left) {
-          return tree.left;
-        }
-      };
-      const contour = (
-        left,
-        right,
-        maxOffset = 0,
-        leftOffset = 0,
-        rightOffset = 0,
-        leftOuter = null,
-        rightOuter = null
-      ) => {
-        delta = left.x + leftOffset - (right.x + rightOffset);
-        if (!maxOffset || delta > maxOffset) {
-          maxOffset = delta;
-        }
-        leftOuter = leftOuter || left;
-        rightOuter = rightOuter || right;
-
-        const lo = nextLeft(left);
-        const li = nextRight(left);
-        const ri = nextLeft(right);
-        const ro = nextRight(right);
-
-        if (li && ri) {
-          leftOffset += left.mod
-          rightOffset += right.mod          
-          return contour(li, ri, maxOffset, leftOffset, rightOffset, lo, ro);
-        }
-        return {li, ri, maxOffset, leftOffset, rightOffset, leftOuter, rightOuter}
-      };
-
-      const fixSubtrees = (left, right) => {
-        const {li, ri, maxOffset, leftOffset, rightOffset, leftOuter, rightOuter} = contour(left, right)
-        let diff = maxOffset + 1
-        diff += (right.x + diff + left.x) / 2
-        
-
       }
-    },
-    bx() {
-      const step = 2;
-      const maxDepth = this.maxDepth;
-      const map = this.binaryTree.reduce((map, item) => {
-        return { ...map, [item.id]: { ...item } };
-      }, {});
-      const root = map[this.tree.root];
-
-      const isLeftMost = (node) => {
-        const parent = map[node.parent];
-        return parent && parent.left === node;
-      };
-      const calculateInitialXY = (node, depth) => {
-        node.x = -1;
-        node.y = depth;
-        node.mod = 0;
-        if (node.left) {
-          calculateInitialXY(map[node.left], depth + 1);
-        }
-        if (node.right) {
-          calculateInitialXY(map[node.right], depth + 1);
-        }
-        if (node.left && node.right) {
-          // Binary
-        } else if (!node.left && !node.right) {
-          // Leaf
-          if (isLeftMost(node)) {
-          }
-        } else {
-          // Single
-        }
-      };
+      walk(root)
+      // this.binaryTree.forEach((node) => {
+      //   treeMaker.add(node.id, node.parent || null, node);
+      // });
+      return treeMaker
+        .layoutTree()
+        .map((item) => {
+          return { ...item.data, ...item };
+        })
+        .reduce((map, item) => {
+          return { ...map, [item.id]: { ...item } };
+        }, {});
     },
     root() {
       return this.tree.nodes.find((e) => e.id === this.tree.root);
