@@ -84,27 +84,7 @@
     {
       "id": 106,
       "value": "Right B"
-    },
-    {
-      "id": 107,
-      "value": "Left B+"
-    },
-    {
-      "id": 108,
-      "value": "Right A+"
-    },
-    {
-      "id": 109,
-      "value": "Left chain 1"
-    },
-    {
-      "id": 110,
-      "value": "Left chain 2"
-    },
-    {
-      "id": 111,
-      "value": "Left chain 3"
     }
-  ],
+ ],
   "root": 100
 }
