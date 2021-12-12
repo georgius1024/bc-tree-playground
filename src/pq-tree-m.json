@@ -3,12 +3,12 @@
     {
       "parentNode": 101,
       "childNode": 102,
-      "left": true
+      "left": false
     },
     {
       "parentNode": 101,
       "childNode": 103,
-      "left": false
+      "left": true
     },
     {
       "parentNode": 103,
