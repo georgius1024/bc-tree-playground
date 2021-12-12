@@ -66,7 +66,7 @@
 <script>
 import tree from "../tree.json";
 //import tree from "../pq-tree.json";
-// import tree from "../pq-tree-m.json";
+//import tree from "../pq-tree-m.json";
 import KnuthTreeNode from "./KnuthTreeNode.vue";
 import WetherellShannonTreeNode from "./WetherellShannonTreeNode.vue";
 import TreeNode from "./TreeNode.vue";
@@ -307,25 +307,23 @@ export default {
         let leftContour = -Infinity;
         if (node.left) {
           traverse(getNode(node.left), (node) => {
-            leftContour = Math.max(leftContour, node.final);
+            //console.log(leftContour, +node.final)
+            leftContour = Math.max(leftContour, +node.final);
           });
         }
 
         let rightContour = +Infinity;
         if (node.right) {
           traverse(getNode(node.right), (node) => {
-            rightContour = Math.min(rightContour, node.final);
+            rightContour = Math.min(rightContour, +node.final);
           });
         }
-
         if (leftContour >= rightContour) {
           traverse(
             getNode(node.right),
             (node) => (node.final += leftContour - rightContour + step)
           );
         }
-        node.x = node.final;
-        delete node.final;
       };
       const fixLeftBorder = (node) => {
         let leftCorrection = Infinity;
@@ -337,10 +335,32 @@ export default {
           traverse(node, (node) => (node.x -= leftCorrection));
         }
       };
+      const placeX = (node) => {
+        traverse(
+          node,
+          (node) => (node.x = node.final)
+        );
+      };
+      const centerX = (node) => {
+        traverse(
+          node,
+          (node) => {
+            if (node.left && node.right) {
+              const leftX = map[node.left].x
+              const rightX = map[node.right].x
+              node.x = (leftX + rightX) / 2
+            }
+            
+          }
+        );
+      };
+
       prepareData(root, 0, null);
       firstPass(root);
       secondPass(root, 0);
       fixNodeConflicts(root);
+      placeX(root);
+      centerX(root);
       fixLeftBorder(root);
       return map;
     },
