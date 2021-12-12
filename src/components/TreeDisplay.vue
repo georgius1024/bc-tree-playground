@@ -46,6 +46,21 @@
       />
     </div>
     <hr />
+    <h1>Rheingold Tilford</h1>
+    <div class="canvas" :style="{ height: `${120 * (maxDepth + 1)}px` }">
+      <TreeNode
+        v-for="node in reingoldTilford"
+        :key="node.id"
+        :node="node"
+        :width="80"
+        :height="80"
+        :dx="120"
+        :dy="120"
+        :left="reingoldTilford[node.left]"
+        :right="reingoldTilford[node.right]"
+      />
+    </div>
+    <hr />
     <h1>Walker</h1>
     <div class="canvas" :style="{ height: `${150 * (maxDepth + 1)}px` }">
       <TreeNode
@@ -255,9 +270,6 @@ export default {
         }
       }
       walk(root)
-      // this.binaryTree.forEach((node) => {
-      //   treeMaker.add(node.id, node.parent || null, node);
-      // });
       return treeMaker
         .layoutTree()
         .map((item) => {
@@ -339,7 +351,6 @@ export default {
         let leftContour = -Infinity;
         if (node.left) {
           traverse(getNode(node.left), (node) => {
-            //console.log(leftContour, +node.final)
             leftContour = Math.max(leftContour, +node.final);
           });
         }
