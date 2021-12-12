@@ -78,9 +78,10 @@
   </div>
 </template>
 <script>
+//import tree from "../kurz.json";
 //import tree from "../tree.json";
-//import tree from "../pq-tree.json";
-import tree from "../pq-tree-m.json";
+import tree from "../pq-tree.json";
+//import tree from "../pq-tree-m.json";
 import KnuthTreeNode from "./KnuthTreeNode.vue";
 import WetherellShannonTreeNode from "./WetherellShannonTreeNode.vue";
 import TreeNode from "./TreeNode.vue";
@@ -263,13 +264,13 @@ export default {
       const walk = (node) => {
         treeMaker.add(node.id, node.parent || null, node);
         if (node.left) {
-          walk(map[node.left])
+          walk(map[node.left]);
         }
         if (node.right) {
-          walk(map[node.right])
+          walk(map[node.right]);
         }
-      }
-      walk(root)
+      };
+      walk(root);
       return treeMaker
         .layoutTree()
         .map((item) => {
@@ -340,6 +341,20 @@ export default {
           secondPass(getNode(node.right), node.modifier + modSum);
         }
       };
+      const hasConflicts = (node) => {
+        const places = {}
+        let conflicts = 0
+        traverse(node, (node) => {
+          if (!places[node.y]) {
+            places[node.y] = {}
+          }
+          if (places[node.y][node.final]) {
+            conflicts ++
+          }
+          places[node.y][node.final] = 1
+        });
+        return conflicts
+      }
       const fixNodeConflicts = (node) => {
         if (node.left) {
           fixNodeConflicts(getNode(node.left));
@@ -368,43 +383,38 @@ export default {
           );
         }
       };
-      const fixLeftBorder = (node) => {
+      const fixFinalX = (node) => {
         let leftCorrection = Infinity;
         traverse(
           node,
-          (node) => (leftCorrection = Math.min(node.x, leftCorrection))
+          (node) => (leftCorrection = Math.min(+node.final, leftCorrection))
         );
         if (leftCorrection < 0) {
-          traverse(node, (node) => (node.x -= leftCorrection));
+          traverse(node, (node) => (node.final -= leftCorrection));
         }
       };
       const placeX = (node) => {
-        traverse(
-          node,
-          (node) => (node.x = node.final)
-        );
+        traverse(node, (node) => (node.x = node.final));
       };
-      const centerX = (node) => {
-        traverse(
-          node,
-          (node) => {
-            if (node.left && node.right) {
-              const leftX = map[node.left].x
-              const rightX = map[node.right].x
-              node.x = (leftX + rightX) / 2
-            }
-            
+      const centerFinalX = (node) => {
+        traverse(node, (node) => {
+          if (node.left && node.right) {
+            const leftX = map[node.left].final;
+            const rightX = map[node.right].final;
+            node.final = (leftX + rightX) / 2;
           }
-        );
+        });
       };
 
       prepareData(root, 0, null);
       firstPass(root);
       secondPass(root, 0);
-      fixNodeConflicts(root);
+      fixFinalX(root);
+      if (hasConflicts(root)) {
+        fixNodeConflicts(root);
+        centerFinalX(root);
+      }
       placeX(root);
-      centerX(root);
-      fixLeftBorder(root);
       return map;
     },
     root() {
