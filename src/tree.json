@@ -29,6 +29,31 @@
       "parentNode": 102,
       "childNode": 106,
       "left": false
+    },
+    {
+      "parentNode": 104,
+      "childNode": 107,
+      "left": false
+    },
+    {
+      "parentNode": 105,
+      "childNode": 108,
+      "left": true
+    },
+    {
+      "parentNode": 103,
+      "childNode": 109,
+      "left": true
+    },
+    {
+      "parentNode": 109,
+      "childNode": 110,
+      "left": true
+    },
+    {
+      "parentNode": 110,
+      "childNode": 111,
+      "left": true
     }
   ],
   "nodes": [

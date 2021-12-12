@@ -13,7 +13,7 @@ class Tree {
       iSiblingSeparation: 1,
       iSubtreeSeparation: 1,
       defaultNodeWidth: 1,
-      defaultNodeHeight: 1,
+      defaultNodeHeight: 0,
       iRootOrientation: Tree.RO_TOP,
       iNodeJustification: Tree.NJ_TOP,
       topXAdjustment: 0,
