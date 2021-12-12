@@ -64,9 +64,9 @@
   </div>
 </template>
 <script>
-import tree from "../tree.json";
+//import tree from "../tree.json";
 //import tree from "../pq-tree.json";
-//import tree from "../pq-tree-m.json";
+import tree from "../pq-tree-m.json";
 import KnuthTreeNode from "./KnuthTreeNode.vue";
 import WetherellShannonTreeNode from "./WetherellShannonTreeNode.vue";
 import TreeNode from "./TreeNode.vue";
